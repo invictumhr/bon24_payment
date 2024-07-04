@@ -21,6 +21,7 @@ export default  {
             paymentCodeInputClass: "",
             displayForm: 'block',
             displaySuccess: 'none',
+            checkCodeStarted: false
         }
     },
     mounted () {
@@ -104,7 +105,7 @@ export default  {
                         if(response.data.redirect_url){
                             setTimeout(() => {
                                 window.location.href = response.data.redirect_url;
-                            }, 500);
+                            }, 5000);
                         }
                     }else{
                         alert(response.data.message);
@@ -122,6 +123,8 @@ export default  {
                 this.paymentCodeInputClass = "is-invalid";
                 return;
             }
+            if(this.checkCodeStarted) return;
+            this.checkCodeStarted = true;
             axios.get(AX_URL + "check-code" , {
                 params: {
                     code: this.payment_code,
@@ -146,11 +149,14 @@ export default  {
                             this.paymentButtonDisabled = true;
                         }
                     }
+
                 }else{
                     alert(response.data.message);
                 }
+                this.checkCodeStarted = false;
                 console.log(response);
             }).then(error => {
+                this.checkCodeStarted = false;
                 console.log(error);
             });
 

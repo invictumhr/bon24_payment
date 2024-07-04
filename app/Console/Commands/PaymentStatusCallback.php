@@ -43,6 +43,7 @@ class PaymentStatusCallback extends Command
         $startTs = time();
         while(time() - $startTs < 50){
             $doneCnt = $this->callback();
+            die();
             if($doneCnt === 0){
                 sleep(10);
             }
@@ -55,6 +56,7 @@ class PaymentStatusCallback extends Command
 
     public function callback()
     {
+        //error_log(date("H:i:s"), 3, "_callback.txt");
         $cntDone = 0;
         $limitPerCall = 10;
         $response = Http::timeout(10)->withOptions([
@@ -66,21 +68,25 @@ class PaymentStatusCallback extends Command
 
         $response->json();
         foreach ($response["payments"] as $payment){
-            //var_dump($payment);
-
+            $callbackUrl = $payment["callback_url"];
+            if(isset($payment["data"]["callback_url"]) && strlen($payment["data"]["callback_url"]) > 0){
+                $callbackUrl = $payment["data"]["callback_url"];
+            }
             $callBackData = [
                 'payment_id' => $payment["payment_id"],
                 'status' => $payment["status"],
                 'data' => $payment["data"],
             ];
+
             $responseCallback = Http::timeout(30)->withOptions([
-                'base_uri' => $payment["callback_url"]
+                'base_uri' => $callbackUrl
             ])->post("", $callBackData);
 
             $status = 0;
             if($responseCallback->ok()){
                 $status = 1;
             }
+
 
             $response = Http::timeout(10)->withOptions([
                 'base_uri' => env("API_CORE_URL") . "/api/update-callback-status",

@@ -15,6 +15,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [App\Http\Controllers\PaymentController::class, 'index']);
 Route::post('/', [App\Http\Controllers\PaymentController::class, 'index']);
+Route::post('/paypal', [App\Http\Controllers\PaymentController::class, 'paypal']);
+Route::post('/paypal-notify', [App\Http\Controllers\PayPalController::class, 'notify']);
+Route::get('/paypal-notify', [App\Http\Controllers\PayPalController::class, 'notify']);
+
+Route::get('/paypal-ok', [App\Http\Controllers\PayPalController::class, 'ok']);
+Route::post('/paypal-ok', [App\Http\Controllers\PayPalController::class, 'ok']);
+Route::get('/ax/paypal-check', [App\Http\Controllers\PayPalController::class, 'check']);
+Route::get('/paypal-nok', [App\Http\Controllers\PayPalController::class, 'nok']);
+Route::post('/paypal-nok', [App\Http\Controllers\PayPalController::class, 'nok']);
+
+Route::get('/cron/mcrun34534', [App\Http\Controllers\CronController::class, 'runCron']);
 
 
 Route::middleware('ajax_security')->group(function ()

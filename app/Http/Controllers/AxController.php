@@ -59,8 +59,6 @@ class AxController extends Controller
         $codes = $request->input('codes');
         $appParams = strval($request->input('app_params'));
 
-
-
         if(!is_array($codes)){
             return response()->json([
                 'success' => false,
