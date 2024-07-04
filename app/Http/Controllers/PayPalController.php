@@ -129,7 +129,6 @@ class PayPalController extends Controller
 
         //error_log("notify: " . $raw_post_data . PHP_EOL . PHP_EOL, 3, "_paypal.txt");
 
-
         if($securityHash != md5($paymentId . env('APP_KEY')))
         {
             return response()->json([
@@ -165,6 +164,19 @@ class PayPalController extends Controller
             $keyval = explode ('=', $keyval);
             if (count($keyval) == 2)
                 $myPost[$keyval[0]] = urldecode($keyval[1]);
+        }
+
+        $paypalAccountBlockList = [
+            'adis_corey@hotmail.com'
+        ];
+        if(isset($myPost['payer_email']) && in_array($myPost['payer_email'], $paypalAccountBlockList)){
+            $payment->payment_status = "blocklist";
+            $payment->save();
+
+            return response()->json([
+                'status' => 'ok',
+                'message' => 'user in blocklist'
+            ]);
         }
 
         $req = 'cmd=_notify-validate';
